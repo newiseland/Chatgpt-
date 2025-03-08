@@ -16,6 +16,5 @@
   },
   "buildpacks": [
     { "url": "heroku/python" }
-  ],
-  "addons": ["mongolab"]
+  ]
 }
