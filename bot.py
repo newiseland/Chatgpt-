@@ -5,6 +5,8 @@ import openai
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
+from aiogram import F
+
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
@@ -42,11 +44,11 @@ async def start(message: types.Message):
     await message.answer("Welcome! I'm an AI-powered chatbot with ChatGPT responses. 🚀", reply_markup=keyboard)
 
 # Callback query handler
-@dp.callback_query(lambda c: c.data == "talk")
+@dp.callback_query(F.data == "talk")
 async def talk(callback_query: types.CallbackQuery):
     await bot.send_message(callback_query.from_user.id, "Sure! Just send me a message and I'll reply smartly. 😎")
 
-@dp.callback_query(lambda c: c.data == "features")
+@dp.callback_query(F.data == "features")
 async def features(callback_query: types.CallbackQuery):
     await bot.send_message(callback_query.from_user.id, "I can:\n- Chat intelligently (ChatGPT AI)\n- Store chat history\n- Be funny & sarcastic\n- Use MongoDB for memory!")
 
@@ -76,7 +78,6 @@ async def chat_response(message: types.Message):
 
 # Main function to run the bot
 async def main():
-    dp.include_router(dp)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
