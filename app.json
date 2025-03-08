@@ -1,9 +1,8 @@
 {
   "name": "Telegram AI Chatbot",
-  "description": "A smart and funny Telegram bot with AI-powered responses, MongoDB storage, and Heroku deployment.",
+  "description": "A smart AI-powered Telegram bot with ChatGPT responses and MongoDB storage.",
   "repository": "https://github.com/newiseland/Chatgpt-",
-  "logo": "https://www.herokucdn.com/deploy/button.svg",
-  "keywords": ["telegram", "bot", "ai", "heroku", "mongodb"],
+  "keywords": ["telegram", "bot", "ai", "chatgpt", "heroku", "mongodb"],
   "env": {
     "BOT_TOKEN": {
       "description": "Your Telegram Bot Token from BotFather",
@@ -11,6 +10,10 @@
     },
     "MONGO_URI": {
       "description": "Your MongoDB Connection String",
+      "required": true
+    },
+    "OPENAI_API_KEY": {
+      "description": "Your OpenAI API Key for ChatGPT responses",
       "required": true
     }
   },
