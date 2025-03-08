@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import openai
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command
@@ -13,6 +14,7 @@ load_dotenv()
 # Bot token & MongoDB connection
 TOKEN = os.getenv("BOT_TOKEN")
 MONGO_URI = os.getenv("MONGO_URI")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Initialize bot & dispatcher
 bot = Bot(token=TOKEN)
@@ -22,6 +24,9 @@ dp = Dispatcher()
 client = MongoClient(MONGO_URI)
 db = client["telegram_bot_db"]
 collection = db["user_chats"]
+
+# Setup OpenAI API
+openai.api_key = OPENAI_API_KEY
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -34,18 +39,29 @@ async def start(message: types.Message):
     button2 = InlineKeyboardButton(text="⚡ Features", callback_data="features")
     keyboard.add(button1, button2)
 
-    await message.answer("Welcome! I'm an AI-powered chatbot. Let's have some fun! 🚀", reply_markup=keyboard)
+    await message.answer("Welcome! I'm an AI-powered chatbot with ChatGPT responses. 🚀", reply_markup=keyboard)
 
 # Callback query handler
 @dp.callback_query(lambda c: c.data == "talk")
 async def talk(callback_query: types.CallbackQuery):
-    await bot.send_message(callback_query.from_user.id, "Sure! Just send me a message and I'll respond smartly. 😎")
+    await bot.send_message(callback_query.from_user.id, "Sure! Just send me a message and I'll reply smartly. 😎")
 
 @dp.callback_query(lambda c: c.data == "features")
 async def features(callback_query: types.CallbackQuery):
-    await bot.send_message(callback_query.from_user.id, "I can:\n- Chat intelligently\n- Store chat history\n- Be funny & sarcastic\n- Use MongoDB for memory!")
+    await bot.send_message(callback_query.from_user.id, "I can:\n- Chat intelligently (ChatGPT AI)\n- Store chat history\n- Be funny & sarcastic\n- Use MongoDB for memory!")
 
-# Message handler to store chat in MongoDB and respond smartly
+# Function to get response from ChatGPT API
+async def get_chatgpt_response(user_input):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": user_input}]
+        )
+        return response["choices"][0]["message"]["content"]
+    except Exception as e:
+        return "Sorry, I couldn't process that request. 😢"
+
+# Message handler to store chat in MongoDB and respond using ChatGPT
 @dp.message()
 async def chat_response(message: types.Message):
     user_data = {
@@ -55,7 +71,7 @@ async def chat_response(message: types.Message):
     }
     collection.insert_one(user_data)
 
-    response = f"You said: {message.text} 🤖 (I'll improve with time!)"
+    response = await get_chatgpt_response(message.text)
     await message.answer(response)
 
 # Main function to run the bot
