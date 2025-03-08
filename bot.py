@@ -1,4 +1,3 @@
-
 import os
 import logging
 from aiogram import Bot, Dispatcher, types
@@ -10,15 +9,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize bot and dispatcher
-TOKEN = os.getenv("BOT_TOKEN")  # Store your Telegram Bot Token in .env file
+TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 # Setup MongoDB connection
-MONGO_URI = os.getenv("MONGO_URI")  # Store your MongoDB URI in .env file
+MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
-db = client["telegram_bot_db"]  # Database name
-collection = db["user_chats"]  # Collection name
+db = client["telegram_bot_db"]
+collection = db["user_chats"]
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +29,6 @@ async def start(message: types.Message):
     button1 = types.InlineKeyboardButton("🤖 Talk to me", callback_data="talk")
     button2 = types.InlineKeyboardButton("⚡ Features", callback_data="features")
     keyboard.add(button1, button2)
-
     await message.reply("Welcome! I'm an AI-powered chatbot. Let's have some fun! 🚀", reply_markup=keyboard)
 
 # Callback query handler
@@ -40,11 +38,7 @@ async def talk(callback_query: types.CallbackQuery):
 
 @dp.callback_query_handler(lambda c: c.data == "features")
 async def features(callback_query: types.CallbackQuery):
-    await bot.send_message(callback_query.from_user.id, "I can:
-- Chat intelligently
-- Store chat history
-- Be funny & sarcastic
-- Use MongoDB for memory!")
+    await bot.send_message(callback_query.from_user.id, "I can:\n- Chat intelligently\n- Store chat history\n- Be funny & sarcastic\n- Use MongoDB for memory!")
 
 # Message handler to store chat in MongoDB and respond smartly
 @dp.message_handler()
@@ -54,8 +48,7 @@ async def chat_response(message: types.Message):
         "username": message.from_user.username,
         "message": message.text
     }
-    collection.insert_one(user_data)  # Store message in MongoDB
-
+    collection.insert_one(user_data)
     response = f"You said: {message.text} 🤖 (I'll improve with time!)"
     await message.reply(response)
 
