@@ -3,6 +3,7 @@ import logging
 import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.filters import Command
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
@@ -10,8 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Bot token & MongoDB connection
-TOKEN = os.getenv("7777181802:AAELlOjuvhzRwBhv44piyrNXYG5pXOCbeDw")
-MONGO_URI = os.getenv("mongodb+srv://johsir173:ashu271713@cluster0.brmeo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+TOKEN = os.getenv("BOT_TOKEN")
+MONGO_URI = os.getenv("MONGO_URI")
 
 # Initialize bot & dispatcher
 bot = Bot(token=TOKEN)
@@ -26,11 +27,11 @@ collection = db["user_chats"]
 logging.basicConfig(level=logging.INFO)
 
 # /start command handler
-@dp.message(commands=['start'])
+@dp.message(Command("start"))
 async def start(message: types.Message):
     keyboard = InlineKeyboardMarkup()
-    button1 = InlineKeyboardButton("🤖 Talk to me", callback_data="talk")
-    button2 = InlineKeyboardButton("⚡ Features", callback_data="features")
+    button1 = InlineKeyboardButton(text="🤖 Talk to me", callback_data="talk")
+    button2 = InlineKeyboardButton(text="⚡ Features", callback_data="features")
     keyboard.add(button1, button2)
 
     await message.answer("Welcome! I'm an AI-powered chatbot. Let's have some fun! 🚀", reply_markup=keyboard)
@@ -59,6 +60,8 @@ async def chat_response(message: types.Message):
 
 # Main function to run the bot
 async def main():
+    dp.include_router(dp)
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
