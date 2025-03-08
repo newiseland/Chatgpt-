@@ -1,7 +1,8 @@
 import os
 import logging
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
+from aiogram import Dispatcher
+from aiogram import executor
 from pymongo import MongoClient
 from dotenv import load_dotenv
 
